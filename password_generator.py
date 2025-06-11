@@ -26,6 +26,9 @@ if user wants to retrieve password
 '''
 import random
 import string
+from db import create_table_if_not_exists
+from db import add_password
+from db import retrieve_password
 GET_OPTIONS = ["g","get"]
 CREATE_OPTIONS = ["c","create"]
 SESSION_OPTIONS = GET_OPTIONS + CREATE_OPTIONS
@@ -38,6 +41,9 @@ REQUIREMENTS = {
     3: list(string.ascii_lowercase)
 }
 
+table_name = "password"
+
+create_table_if_not_exists(table_name)
 
 def print_intro():
     print("Welcome to the Password Vault")
@@ -51,7 +57,6 @@ def complete_password(password):
             
 
 def generate_password():
-    service = input("What kind of service is this passowrd for?").lower()
     password_length = random.randint(DEFAULT_PASSWORD_SIZE, MAX_PASSWORD_SIZE)
     output = [None] * password_length
        
@@ -63,11 +68,9 @@ def generate_password():
         random_requirement_index = random.randint(0,len(REQUIREMENTS[i]) - 1)
         output[random_index] = REQUIREMENTS[i][random_requirement_index]
     output = complete_password(output)
-    return "".join(output)
+    print(output)
+    return "".join(str(element) for element in output)
 
-def get_password():
-    print("Getting Password")
-    return 
 
 def main():
     print_intro()
@@ -77,22 +80,13 @@ def main():
         exit(1)
     if type_of_session in CREATE_OPTIONS:
         password = generate_password()
+        site_name = input("What site is this for?").lower()
+        add_password(site_name, password)
         print(password)
     elif type_of_session in GET_OPTIONS:
-        get_password()
+        site_name = input("What is the name of the site you have a password for?").lower()
+        retrieve_password(site_name)
     
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
