@@ -1,4 +1,5 @@
 import sqlite3
+import hashlib
 
 database_file = "password.db"
 
@@ -27,13 +28,16 @@ def create_table_if_not_exists(table_name):
         if conn:
             conn.close()  # Close the connection
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def add_password(site_name, password): # Check to make sure that the site name doesnt already exists
     try:
+      hashed_pw = hash_password(password)
       conn = sqlite3.connect(database_file)  # Connect to the database.
       cursor = conn.cursor()  # Create a cursor object.
       add_value_to_password_table = f""" INSERT INTO password (site_name, password) VALUES (?,?)"""
-      cursor.execute(add_value_to_password_table,(site_name,password))
+      cursor.execute(add_value_to_password_table,(site_name,hashed_pw))
       conn.commit()
       print(f"'{site_name}' has been added to table.")
   
